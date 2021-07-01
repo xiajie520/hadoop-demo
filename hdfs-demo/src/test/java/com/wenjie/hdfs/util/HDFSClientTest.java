@@ -1,14 +1,18 @@
 package com.wenjie.hdfs.util;
 
+import com.alibaba.fastjson.JSONObject;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.LocatedFileStatus;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.RemoteIterator;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Arrays;
 
 
 public class HDFSClientTest {
@@ -102,4 +106,61 @@ public class HDFSClientTest {
         boolean isr = true;
         fs.delete(path, isr);
     }
+
+    /**
+     * 测试更名和移动
+     *
+     * @throws Exception
+     */
+    @Test
+    public void mvTest() throws Exception {
+        Path path = new Path("/idea/input5");
+        // 第一个是源文件或文件夹，第二个是目标文件或文件夹
+        // fs移动时会截取最后一段名称作为文件名或者文件夹的名称，如目标是文件夹名称，则会置入文件夹，如目标名称不存在，则会更名为目标名称
+        // 与linux中的mv命令大概相同
+        fs.rename(path, new Path("/idea/dir1/tt"));
+    }
+
+    /**
+     * 查看文件信息
+     *
+     * @throws Exception
+     */
+    @Test
+    public void getFileInfo() throws Exception {
+        // 两个参数   final Path f 文件路径, final boolean recursive 是否递归++
+
+        RemoteIterator<LocatedFileStatus> listFiles = fs.listFiles(new Path("/"), true);
+        while (listFiles.hasNext()) {
+            LocatedFileStatus next = listFiles.next();
+            System.out.println("=====" + next.getPath() + "=====");
+            /**
+             * 参数
+             *     private static final long serialVersionUID = 332065512L;
+             *     private Path path; 路径
+             *     private long length; 文件大小
+             *     private Boolean isdir; 是否为文件夹
+             *     private short block_replication;
+             *     private long blocksize; 文件块大小
+             *     private long modification_time; 更新时间
+             *     private long access_time; 上传时间
+             *     private FsPermission permission; 权限
+             *     private String owner; 文件所属人
+             *     private String group; 文件所属组
+             *     private Path symlink; 符号链接
+             *     private Set<FileStatus.AttrFlags> attr; 属性标志
+             *     public static final Set<FileStatus.AttrFlags> NONE = Collections.emptySet();
+             *     private BlockLocation[] locations; 所有块信息
+             */
+            System.out.println(next.getReplication());
+            System.out.println(next.getAccessTime());
+            if (next.isSymlink()) {
+                System.out.println(next.getSymlink());
+            }
+            System.out.println(Arrays.toString(next.getBlockLocations()));
+
+
+        }
+    }
+
 }

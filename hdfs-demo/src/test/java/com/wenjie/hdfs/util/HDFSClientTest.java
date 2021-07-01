@@ -97,9 +97,9 @@ public class HDFSClientTest {
     @Test
     public void delTest() throws IOException {
         // 需要删除的文件
-        Path var1 = new Path("/idea/dir2");
+        Path path = new Path("/idea/dir2");
         // 是否递归删除 ,删除空目录或者删除文件的时候可以是false，删除非空目录需要设置为true
-        boolean var = true;
-        fs.delete(var1, var);
+        boolean isr = true;
+        fs.delete(path, isr);
     }
 }

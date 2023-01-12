@@ -2,10 +2,7 @@ package com.wenjie.hdfs.util;
 
 import com.alibaba.fastjson.JSONObject;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.LocatedFileStatus;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.fs.RemoteIterator;
+import org.apache.hadoop.fs.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,7 +25,7 @@ public class HDFSClientTest {
      */
     @Before
     public void init() throws Exception {
-        URI uri = new URI("hdfs://hadoop01:8020");
+        URI uri = new URI("hdfs://hadoop101:8020");
 
         /**
          * 配置优先级 由低到高：hdfs-default.xml -> 环境中的hdfs-site.xml ->程序配置中的hdfs-site.xml -> 代码中编写的conf
@@ -66,7 +63,7 @@ public class HDFSClientTest {
 //        如目标路径已经有文件了，是否覆盖
         boolean overwrite = true;
         // 源文件路径
-        Path src = new Path("J:\\软件\\typora（MD）.exe");
+        Path src = new Path("C:\\Users\\admin\\Desktop\\jd-gui.exe - 快捷方式.lnk");
         // 目标文件路径（这里有个坑）
         /**
          * 举例，如/idea/dir2这个文件夹不存在，上面的文件会直接上传到/idea文件夹，并且重命名为dir2,你就得到了一个名为dir2的文件
@@ -130,7 +127,7 @@ public class HDFSClientTest {
     public void getFileInfo() throws Exception {
         // 两个参数   final Path f 文件路径, final boolean recursive 是否递归++
 
-        RemoteIterator<LocatedFileStatus> listFiles = fs.listFiles(new Path("/"), true);
+        RemoteIterator<LocatedFileStatus> listFiles = fs.listFiles(new Path("/input"), true);
         while (listFiles.hasNext()) {
             LocatedFileStatus next = listFiles.next();
             System.out.println("=====" + next.getPath() + "=====");
@@ -160,6 +157,23 @@ public class HDFSClientTest {
             System.out.println(Arrays.toString(next.getBlockLocations()));
 
 
+        }
+    }
+
+    /**
+     * 判断是文件还是文件夹
+     */
+    @Test
+    public void listItem() throws IOException {
+        FileStatus[] fileStatuses = fs.listStatus(new Path("/idea/dir2"));
+        for (FileStatus fileStatus : fileStatuses) {
+            if (fileStatus.isFile()) {
+                System.out.println(fileStatus.getPath() + " is file !");
+            }else if (fileStatus.isDirectory()){
+                System.out.println(fileStatus.getPath() + " is directory !");
+            }else {
+                System.out.println("unknown");
+            }
         }
     }
 
